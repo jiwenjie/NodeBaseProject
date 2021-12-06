@@ -1,0 +1,48 @@
+{
+  "name": "admin-tmpl-mock",
+  "version": "0.1.0",
+  "private": true,
+  "homepage": "https://RainManGO.github.io/vue3-composition-admin",
+  "scripts": {
+    "start": "cd mock && ts-node-dev mock.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "clipboard": "^2.0.6",
+    "core-js": "^3.6.5",
+    "crypto-ts": "^1.0.2",
+    "dayjs": "^1.10.3",
+    "faker": "^5.1.0",
+    "file-saver": "^2.0.5",
+    "koa": "^2.13.4",
+    "koa-body": "^4.2.0",
+    "koa-logger": "^3.2.1",
+    "koa-router": "^10.1.1",
+    "koa2-cors": "^2.0.6",
+    "lodash": "^4.17.21",
+    "log4js": "^6.3.0",
+    "moment": "^2.29.1",
+    "mysql2": "^2.3.3",
+    "path-to-regexp": "^6.2.0",
+    "reflect-metadata": "^0.1.13",
+    "screenfull": "^6.0.0",
+    "sequelize": "*",
+    "sortablejs": "^1.14.0"
+  },
+  "devDependencies": {
+    "@types/faker": "^5.1.5",
+    "@types/file-saver": "^2.0.4",
+    "@types/koa": "^2.13.4",
+    "@types/koa-logger": "^3.1.2",
+    "@types/koa-router": "^7.4.4",
+    "@types/koa2-cors": "^2.0.2",
+    "@types/node": "^16.11.11",
+    "@types/sortablejs": "^1.10.7",
+    "@typescript-eslint/eslint-plugin": "^5.5.0",
+    "@typescript-eslint/parser": "^5.5.0",
+    "cross-env": "^7.0.3",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "~4.3.5"
+  }
+}
