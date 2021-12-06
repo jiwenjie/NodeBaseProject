@@ -5,7 +5,7 @@
  * @LastEditors: 吉文杰
  * @LastEditTime: 2021-11-21 17:31:24
  */
-import { get} from "../requestDecorator";
+import { get } from "../requestDecorator";
 export default class Ping {
     @get('/ping')
     async ping(){

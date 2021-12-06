@@ -1,5 +1,5 @@
 /*
- * @Description:table列表接口
+ * @Description:table列表接口 (此处保留不删除，展示 faker.js 模拟数据框架得使用方法)
  * @Author: 吉文杰
  * @Date: 2021-11-20 09:46:46
  * @LastEditors: 吉文杰

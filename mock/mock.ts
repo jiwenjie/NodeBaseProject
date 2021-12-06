@@ -16,7 +16,6 @@ import chalk from "chalk";
 import cors from "koa2-cors";
 import path from 'path'
 
-
 // 实例化 Koa
 const app = new Koa();
 app.use(cors());
@@ -36,7 +35,6 @@ app.use(koaBody());
 // 对所有请求进行拦截，打印出所有的请求和响应日志数据
 app.use(async (ctx, next) => {
   log4.debug(path.dirname, chalk.green('请求body:  ') + JSON.stringify(ctx.request.body));
-
   await next()
   // chalk todo 控制台打印内容样式改变框架（用来设置控制台输出内容的颜色）
   // log4.debug(chalk.green('请求路径:  ') + ctx.request.url);
