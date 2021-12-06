@@ -1,20 +1,3 @@
-<p align="center">
-  <a href="https://github.com/rcyj-FED/vue3-composition-admin-docs" target="_blank">
-    <img width="180" src="https://github.com/rcyj-FED/vue3-composition-admin-docs/blob/main/docs/.vuepress/public/icons/android-chrome-192x192.png" alt="logo">
-  </a>
-</p>
-
-<p align="center">
-   <a href="https://github.com/npm/npm">
-    <img src="https://img.shields.io/badge/npm-6.1.8-blue" alt="npm">
-   </a>
-   <a href="https://gitter.im/vue3Admin/community">
-    <img src="https://badges.gitter.im/Join%20Chat.svg" alt="gitter">
-  </a>
-</p>
-
-> vue3-composition-admin 是一个管理端模板解决方案，mock 是该项目后端模拟数据部分。
-
 ## 简介
 
 项目的基础版本出自于源于花裤衩大佬的 vue-element-admin。
