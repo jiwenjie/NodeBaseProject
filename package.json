@@ -28,7 +28,8 @@
     "reflect-metadata": "^0.1.13",
     "screenfull": "^6.0.0",
     "sequelize": "*",
-    "sortablejs": "^1.14.0"
+    "sortablejs": "^1.14.0",
+    "ws": "^8.3.0"
   },
   "devDependencies": {
     "@types/faker": "^5.1.5",

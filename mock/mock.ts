@@ -14,7 +14,8 @@ import log4js from "log4js";
 import { ResultHandler } from './middleware/resultHandler'
 import chalk from "chalk";
 import cors from "koa2-cors";
-import path from 'path'
+import path from 'path';
+import { initWebSocket } from "./utils/Socket";
 
 // 实例化 Koa
 const app = new Koa();
@@ -65,6 +66,11 @@ app.on("error", (err, ctx: Context) => {
     ctx.res.end(err.stack); //finish the response
   }
 });
+
+// 初始化 socket 连接
+let serverInstance = initWebSocket(true);
+// close 方法关闭 socket 连接
+// serverInstance.close();
 
 // 开启端口监听
 app.listen(port, () => {
