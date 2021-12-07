@@ -6,7 +6,6 @@
  * @LastEditTime: 2021-12-07 17:31:24 
  */
 let WS = require("ws");
-import { IncomingMessage } from 'http';
 import logUtils from './logger';
 
 export function initWebSocket(debug: Boolean = false, port: Number = 8088, callBack?: Function): any {

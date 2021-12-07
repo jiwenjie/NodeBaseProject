@@ -7,8 +7,8 @@
  */
 import { get } from "../requestDecorator";
 export default class Ping {
-    @get('/ping')
-    async ping(){
-      return 'pong'
-    }
+  @get('/ping')
+  async ping() {
+    return 'pong'
+  }
 }

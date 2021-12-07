@@ -100,11 +100,11 @@ export default class Article {
   }
   @post('/updateArticle')
   updateArticle(ctx: any) {
-    const article  = ctx.request.body
+    const article = ctx.request.body
 
     for (const v of articleList) {
       if (v.id.toString() == article.id) {
-        return  article
+        return article
       }
     }
     return {

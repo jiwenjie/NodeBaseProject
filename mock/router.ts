@@ -24,46 +24,46 @@ const addRouter = (router: Router) => {
     }
   });
 
-/***** path.resolve start  *****/
-// path.resolve 方法的语法如下所示
-// path.resolve([...paths])
+  /***** path.resolve start  *****/
+  // path.resolve 方法的语法如下所示
+  // path.resolve([...paths])
 
-// example ----- 使用示例如下
-// console.log(path.resolve())           // returns /workspace/demo
-// console.log(path.resolve(''))         // returns /workspace/demo
-// console.log(path.resolve(__dirname))  // returns /workspace/demo
-// console.log(path.resolve('/img/books', '/net'))   // returns '/net'
-// console.log(path.resolve('img/books', '/net'))    // returns '/net'
-// console.log(path.resolve('img/books', './net'))   // returns '/workspace/demo/img/books/net'
-// console.log(path.resolve('/img/books', './net'))   // returns '/img/books/net'
-// console.log(path.resolve('/img/books', 'net'))     // returns '/img/books/net'
-// console.log(path.resolve('/img/books', '../net'))         // returns '/img/net'
-// console.log(path.resolve('src','/img/books', '../net'))   // returns '/img/net'
-// console.log(path.resolve('src','./img/books', '../net'))   // returns '/workspace/demo/src/img/net'
-// console.log(path.resolve('src','img/books', '../net'))     // returns '/workspace/demo/src/img/net'
+  // example ----- 使用示例如下
+  // console.log(path.resolve())           // returns /workspace/demo
+  // console.log(path.resolve(''))         // returns /workspace/demo
+  // console.log(path.resolve(__dirname))  // returns /workspace/demo
+  // console.log(path.resolve('/img/books', '/net'))   // returns '/net'
+  // console.log(path.resolve('img/books', '/net'))    // returns '/net'
+  // console.log(path.resolve('img/books', './net'))   // returns '/workspace/demo/img/books/net'
+  // console.log(path.resolve('/img/books', './net'))   // returns '/img/books/net'
+  // console.log(path.resolve('/img/books', 'net'))     // returns '/img/books/net'
+  // console.log(path.resolve('/img/books', '../net'))         // returns '/img/net'
+  // console.log(path.resolve('src','/img/books', '../net'))   // returns '/img/net'
+  // console.log(path.resolve('src','./img/books', '../net'))   // returns '/workspace/demo/src/img/net'
+  // console.log(path.resolve('src','img/books', '../net'))     // returns '/workspace/demo/src/img/net'
 
-// Tips: Important ( 方法使用总结部分 )
-// 总结一下：参数从后向前，若字符以 / 开头，不会拼接到前面的路径；若以 ../ 开头，
-// 拼接前面的路径，但是不含前面一节的最后一层路径；若以 ./ 开头 或者没有符号 则拼接前面路径；
+  // Tips: Important ( 方法使用总结部分 )
+  // 总结一下：参数从后向前，若字符以 / 开头，不会拼接到前面的路径；若以 ../ 开头，
+  // 拼接前面的路径，但是不含前面一节的最后一层路径；若以 ./ 开头 或者没有符号 则拼接前面路径；
 
 
-/***** path.join start  *****/
-// 语法：path.join([...paths])
+  /***** path.join start  *****/
+  // 语法：path.join([...paths])
 
-// 使用示例如下
-// path.join('/img', 'book', 'net/abc', 'inter', '..');  // returns /img/book/net/abc
-// console.log(path.join('/img/books', '../net'))    // returns /img/net
-// console.log(path.join('img/books', '../net'))     // returns img/net
-// console.log(path.join('/img/books', './net'))     // returns /img/books/net
-// console.log(path.join('img/books', './net'))      // returns img/books/net
-// console.log(path.join('/img/books', 'net'))       // returns /img/books/net
-// console.log(path.join('img/books', 'net'))        // returns /img/books/net
-// console.log(path.join('/img/books', '/net'))      // returns /img/books/net
-// console.log(path.join('img/books', '/net'))       // returns img/books/net
+  // 使用示例如下
+  // path.join('/img', 'book', 'net/abc', 'inter', '..');  // returns /img/book/net/abc
+  // console.log(path.join('/img/books', '../net'))    // returns /img/net
+  // console.log(path.join('img/books', '../net'))     // returns img/net
+  // console.log(path.join('/img/books', './net'))     // returns /img/books/net
+  // console.log(path.join('img/books', './net'))      // returns img/books/net
+  // console.log(path.join('/img/books', 'net'))       // returns /img/books/net
+  // console.log(path.join('img/books', 'net'))        // returns /img/books/net
+  // console.log(path.join('/img/books', '/net'))      // returns /img/books/net
+  // console.log(path.join('img/books', '/net'))       // returns img/books/net
 
-// Tips：Important ( join 方法使用总结部分 )
-// 总结一下 区别：join()只是拼接各个path片段，并不像resolve()一样除了拼接各个字段还拼接了工作目录的路径，
-// 其次如果以/开头的字符串片段在join并不像resolve一样是只返回自身，还有就是.. 同 ../是一个意思都代表上一级目录
+  // Tips：Important ( join 方法使用总结部分 )
+  // 总结一下 区别：join()只是拼接各个path片段，并不像resolve()一样除了拼接各个字段还拼接了工作目录的路径，
+  // 其次如果以/开头的字符串片段在join并不像resolve一样是只返回自身，还有就是.. 同 ../是一个意思都代表上一级目录
 
   // 结合meta数据添加路由 和 验证
   modules.forEach(mItem => {
@@ -80,7 +80,7 @@ const addRouter = (router: Router) => {
 
     if (routerMap.length) {
       const ctr = new mItem();
-      routerMap.forEach(route => {        
+      routerMap.forEach(route => {
         // console.log('routerMap route item', route);
         // const {name, method, path, isVerify} = route;
         const { name, method, path } = route;

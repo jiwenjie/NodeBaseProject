@@ -39,7 +39,7 @@ app.use(async (ctx, next) => {
   await next()
   // chalk todo 控制台打印内容样式改变框架（用来设置控制台输出内容的颜色）
   // log4.debug(chalk.green('请求路径:  ') + ctx.request.url);
-  log4.debug(path.dirname, chalk.green('返回数据:  ')+ JSON.stringify(ctx.body));
+  log4.debug(path.dirname, chalk.green('返回数据:  ') + JSON.stringify(ctx.body));
 })
 
 // 增加中间件，统一返回内容包裹体

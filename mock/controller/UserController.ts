@@ -87,7 +87,7 @@ export default class UserController {
     try {
       let user = await usersModel.create(userNodel);
       return user;
-    } catch(exception) {
+    } catch (exception) {
       console.log('exception-created response', exception);
       // 捕获异常
       return {
@@ -116,7 +116,7 @@ export default class UserController {
         }
       });
       return user;
-    } catch(exception) {
+    } catch (exception) {
       console.log('exception-created response', exception);
       // 捕获异常
       return {
@@ -151,7 +151,7 @@ export default class UserController {
         }
       });
       return user;
-    } catch(exception) {
+    } catch (exception) {
       console.log('exception-created response', exception);
       // 捕获异常
       return {
@@ -176,13 +176,13 @@ export default class UserController {
 
     // findByPk
     // findByPk 方法使用提供的主键从表中仅获得一个条目.
-//     const project = await Project.findByPk(123);
-//     if (project === null) {
-//       console.log('Not found!');
-//     } else {
-//       console.log(project instanceof Project); // true
-//       // 它的主键是 123
-//     }
+    //     const project = await Project.findByPk(123);
+    //     if (project === null) {
+    //       console.log('Not found!');
+    //     } else {
+    //       console.log(project instanceof Project); // true
+    //       // 它的主键是 123
+    //     }
 
     try {
       // findOne 方法获得它找到的第一个条目(它可以满足提供的可选查询参数).
@@ -192,7 +192,7 @@ export default class UserController {
         }
       })
       return user;
-    } catch(exception) {
+    } catch (exception) {
       console.log('exception-created response', exception);
       // 捕获异常
       return {
@@ -206,7 +206,7 @@ export default class UserController {
   async loadUserList(ctx: any) {
     logUtils.debug('userInfo -- ', ctx.request.body);
     const { pageNo = 1, limit = 15, username } = ctx.request.body;
-    
+
     try {
       // 正常只是返回全部数据得方法
       // let result = await usersModel.findAll({
@@ -238,7 +238,7 @@ export default class UserController {
         count,
         rows
       };
-    } catch(exception) {
+    } catch (exception) {
       console.log('exception-created response', exception);
       // 捕获异常
       return {
