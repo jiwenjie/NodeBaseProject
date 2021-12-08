@@ -6,13 +6,13 @@
  * @LastEditTime: 2021-01-21 17:31:24
  */
 import { post, prefix, get } from "../requestDecorator";
-import SequelizeInstance from "../mockdb/db";   // 导入数据库实例信息
+import { createModel } from "../mockdb/ModelUtils";
 import logUtils from '../utils/logger';    // 导入日志工具
 import { Op } from "sequelize/dist";    // 从库中导入运算符，Op中包含多种各式各样得运算符
-let { Sequelize, Model, DataTypes } = require('sequelize');
+let { Sequelize, DataTypes } = require('sequelize');
 
 // 创建用户 model
-const usersModel = SequelizeInstance.define('user', {
+const usersModel = createModel('user', {
   id: {
     type: DataTypes.UUID,
     defaultValue: Sequelize.UUIDV4, // 或 Sequelize.UUIDV1
@@ -38,26 +38,8 @@ const usersModel = SequelizeInstance.define('user', {
   nickname: {
     type: DataTypes.STRING
   },
-}, {
-  //使用自定义表名
-  freezeTableName: true,  // 设置为 true 表示数据库中得实际表名就是 define 后定义得名称
-  //去掉默认的添加时间和更新时间
-  timestamps: false,
-  // indexes:[
-  //   //普通索引,默认BTREE
-  //     {
-  //         unique: true,
-  //         fields: ['pid']
-  //     },
-  //  ]
 })
 
-//同步: 没有就新建,有就不变
-usersModel.sync();
-// //先删除后同步
-// users.sync({
-//   force: true
-// });
 
 export interface UserModel {
   id: String,   // uuid key 值
