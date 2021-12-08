@@ -27,7 +27,8 @@ export const ResultHandler: MiddleWare = () => async (ctx, next) => {
     res.data = data;
   } catch (err) {
     log.error(err);
-    res.code = err.statusCode
+    res.code = err.statusCode;
+    res.msg = err;
     switch (err.statusCode) {
       case 102:
         res.msg = "用户不存在";

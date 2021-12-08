@@ -1,5 +1,5 @@
 /*
- * @Description: 用户相关接口
+ * @Description: 测试 sequelize 中的关联关系接口 controller
  * @Author: 吉文杰
  * @Date: 2021-12-28 09:46:46
  * @LastEditors: 吉文杰
@@ -11,8 +11,8 @@ import logUtils from '../utils/logger';    // 导入日志工具
 import { Op } from "sequelize/dist";    // 从库中导入运算符，Op中包含多种各式各样得运算符
 let { Sequelize, DataTypes } = require('sequelize');
 
-// 创建用户 model
-const usersModel = createModel('user', {
+// 创建 leader model
+const leaderModelInstance = createModel('leader', {
   id: {
     type: DataTypes.UUID,
     defaultValue: Sequelize.UUIDV4, // 或 Sequelize.UUIDV1
@@ -20,8 +20,8 @@ const usersModel = createModel('user', {
     // autoIncrement: true,    //自增
     comment: "自增id"       //注释:只在代码中有效
   },
-  //用户名
-  username: {
+  //名称
+  name: {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true,   // 唯一键值
@@ -29,52 +29,126 @@ const usersModel = createModel('user', {
     //   isEmail: true,   //类型检测,是否是邮箱格式
     // }
   },
-  //密码
-  pwd: {
-    type: DataTypes.STRING(255),
-    allowNull: false, //不允许为null
-  },
-  //昵称
-  nickname: {
-    type: DataTypes.STRING
+  
+  //年纪
+  age: {
+    type: DataTypes.INTEGER
   },
 })
 
+// 创建 task model
+const taskModelInstance = createModel('task', {
+  // id 主键
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: Sequelize.UUIDV4, // 或 Sequelize.UUIDV1
+    primaryKey: true,       //主键
+    // autoIncrement: true,    //自增
+    comment: "自增id"       //注释:只在代码中有效
+  },
+  // 外键
+  leaderId: {
+    type: DataTypes.UUID,
+    defaultValue: Sequelize.UUIDV4, // 或 Sequelize.UUIDV1
+  },
 
-export interface UserModel {
+  // 任务名称
+  taskName: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+
+  // 等级
+  level: {
+    type: DataTypes.STRING,
+  }
+})
+
+
+// tips：important，此处指定的外键必须在 model 中定义
+leaderModelInstance.hasMany(taskModelInstance, {
+  foreignKey: 'leaderId',
+  sourceKey: 'id'
+});   // 设置一对多管理
+taskModelInstance.belongsTo(leaderModelInstance); // 设置一对多管理
+
+export interface ILeaderModel {
   id: String,   // uuid key 值
-  username: String,   // tips，有个问题，如何设置 ts 属性不可为空值
-  pwd: String,
-  nickname: String
+  name: String,   // tips，有个问题，如何设置 ts 属性不可为空值
+  age: Number,    // 年纪
 }
+
+export interface ITaskModek {
+  id: String,   // uuid key 值
+  taskName: String,   // tips，有个问题，如何设置 ts 属性不可为空值
+  level: "1" | "2" | "3",   // level 等级，1-简单，2-普通，3-困难
+}
+
 
 /**
  * 用户相关 Controller，控制
  * @export
  * @class UserController
  */
-@prefix('/userController')
+@prefix('/AssociateController')
 export default class UserController {
 
-  @post('/createUser')
-  async createUser(ctx: any) {
-    const { username, pwd, nickname } = ctx.request.body;
-    let userNodel = {
-      username,
-      pwd,
-      nickname
+  /** 创建 leader */
+  @post('/createLeader')
+  async createLeader(ctx: any) {
+    const { name, age } = ctx.request.body;
+    let leaderModel = {
+      name,
+      age
     }
-    // create 方法为 build 和 save 的结合 
-    // Sequelize提供了 create 方法,该方法将上述的 build 方法和 save 方法合并为一个方法：
-    let user = await usersModel.create(userNodel);
+    // // create 方法为 build 和 save 的结合 
+    // // Sequelize提供了 create 方法,该方法将上述的 build 方法和 save 方法合并为一个方法：
+    let user = await leaderModelInstance.create(leaderModel);
     return user;
   }
 
-  @post('/deleteUser')
-  async deleteUser(ctx: any) {
+  // 给具体某个 leader 添加关联任务表
+  @post('/leaderAddTask')
+  async leaderAddTask(ctx: any) {
+    const { leaderId, taskName, level } = ctx.request.body;
+    if (!leaderId) {
+      throw new Error("leaderId is not null");
+    }
+
+    let leaderItem = await leaderModelInstance.findOne({
+      where: {
+        id: leaderId
+      }
+    })
+    logUtils.warn('leaderItem MSG-------', leaderItem.toJSON())
+
+    let tempTask = {
+      leaderId: leaderId,
+      taskName,
+      level: level ? level : "1"
+    }
+    // 先新建，后做插入关联（插入的时候直接把 外键 key 值存储进去即可成功，并不一定要用 addXXX 方法）
+    await taskModelInstance.create(tempTask);
+    // let addRes = await leaderItem.addTask(taskItem);
+    // console.log('addRes ------------- ', addRes.toJSON());
+    
+    // todo important: 一对多的时候注意配置方法后面加上 s ，如果设置了别名，此处方法名称也要换成别名的形式
+    return leaderItem.getTasks()
+  }
+
+  @post('/loadUserAllTask')
+  async loadUserAllTask() {
+    const users = await leaderModelInstance.findAll({ include: taskModelInstance });
+    console.log(JSON.stringify(users, null, 2));
+    return users
+  }
+
+  /** 延迟加载示例 */
+  @post('/loadSyncData')
+  async loadSyncData(ctx: any) {
     const { id } = ctx.request.query;
     if (!id) {
-      logUtils.error("/userController/userInfo---- id 值不能为空");
+      logUtils.error("/AssociateController/loadSyncData---- id 值不能为空");
       return {
         errorCode: 7001,
         message: "id Params val is Null"
@@ -82,19 +156,33 @@ export default class UserController {
     }
     // create 方法为 build 和 save 的结合 
     // Sequelize提供了 create 方法,该方法将上述的 build 方法和 save 方法合并为一个方法：
-    let user = await usersModel.destroy({
+    let leaderItem = await leaderModelInstance.findOne({
       where: {
         id: id
       }
     });
-    return user;
+    if (!leaderItem) {
+      return {
+        errorCode: 404,
+        message: "leader not find"
+      }
+    }
+    logUtils.warn("leaderItem Msg", leaderItem.toJSON());
+
+    let taskRes = await leaderModelInstance.getTask();
+    console.log('taskRes msg', taskRes.toJSON());
+    return {
+      taskMsg: taskRes,
+      leaderItem
+    }
   }
 
-  @post('/updateUserInfo')
-  async updateUserInfo(ctx: any) {
-    const { id, username, pwd, nickname } = ctx.request.body;
+  /** 预先加载 */
+  @post('/loadPreData')
+  async loadPreData(ctx: any) {
+    const { id } = ctx.request.query;
     if (!id) {
-      logUtils.error("/userController/userInfo---- id 值不能为空");
+      logUtils.error("/AssociateController/loadSyncData---- id 值不能为空");
       return {
         errorCode: 7001,
         message: "id Params val is Null"
@@ -102,84 +190,13 @@ export default class UserController {
     }
     // create 方法为 build 和 save 的结合 
     // Sequelize提供了 create 方法,该方法将上述的 build 方法和 save 方法合并为一个方法：
-    let updateUser = {
-      id,
-      username,
-      pwd,
-      nickname
-    }
-    let user = await usersModel.update(updateUser, {
+    let leaderItem = await leaderModelInstance.findOne({
       where: {
-        id
-      }
-    });
-    return user;
-  }
-
-  @get('/userInfo')
-  async getUserInfo(ctx: any) {
-    logUtils.debug('userInfo -- ', ctx.request.query);
-    const { id } = ctx.query;
-    logUtils.debug('userInfo id Val is -- ', id);
-    if (!id) {
-      logUtils.error("/userController/userInfo---- id 值不能为空");
-      return {
-        errorCode: 7001,
-        message: "id Params val is Null"
-      }
-    }
-
-    // findByPk
-    // findByPk 方法使用提供的主键从表中仅获得一个条目.
-    //     const project = await Project.findByPk(123);
-    //     if (project === null) {
-    //       console.log('Not found!');
-    //     } else {
-    //       console.log(project instanceof Project); // true
-    //       // 它的主键是 123
-    //     }
-    // findOne 方法获得它找到的第一个条目(它可以满足提供的可选查询参数).
-    let user = await usersModel.findOne({
-      where: {
-        id
-      }
-    })
-    return user;
-  }
-
-  @post('/loadUserList')
-  async loadUserList(ctx: any) {
-    logUtils.debug('userInfo -- ', ctx.request.body);
-    const { pageNo = 1, limit = 15, username } = ctx.request.body;
-    // 正常只是返回全部数据得方法
-    // let result = await usersModel.findAll({
-    //   offset: pageNo === 1 ? 0 : (pageNo - 1) * limit,
-    //   limit,
-    //   where: {
-    //     // username   // 精确查询
-    //     username: {
-    //       // 模糊查询
-    //       [Op.like]: '%' + username + '%'
-    //     }
-    //   }
-    // })
-    // return result;
-    
-    // 如果想要同时返回总 count 数量,则使用 findAndCountAll 方法
-    let { count, rows } = await usersModel.findAndCountAll({
-      offset: pageNo === 1 ? 0 : (pageNo - 1) * limit,
-      limit,
-      where: {
-        username: {
-          [Op.like]: '%' + username + '%'
-        }
+        id: id
       },
-      distinct: true,   // 去重，如果不加可能会出现 Count 数量错误得情况
-    })
-    return {
-      count,
-      rows
-    };
+      include: taskModelInstance
+    });
+    return leaderItem
   }
 }
 
