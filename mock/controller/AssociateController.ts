@@ -1,5 +1,5 @@
 /*
- * @Description: 测试 sequelize 中的关联关系接口 controller
+ * @Description: 测试 sequelize 中的关联关系接口 controller（此处为 1 对 N）
  * @Author: 吉文杰
  * @Date: 2021-12-28 09:46:46
  * @LastEditors: 吉文杰
@@ -29,7 +29,7 @@ const leaderModelInstance = createModel('leader', {
     //   isEmail: true,   //类型检测,是否是邮箱格式
     // }
   },
-  
+
   //年纪
   age: {
     type: DataTypes.INTEGER
@@ -49,7 +49,7 @@ const taskModelInstance = createModel('task', {
   // 外键
   leaderId: {
     type: DataTypes.UUID,
-    defaultValue: Sequelize.UUIDV4, // 或 Sequelize.UUIDV1
+    // defaultValue: Sequelize.UUIDV4, // 或 Sequelize.UUIDV1
   },
 
   // 任务名称
@@ -96,6 +96,10 @@ export default class UserController {
   /** 创建 leader */
   @post('/createLeader')
   async createLeader(ctx: any) {
+    //   {
+    //     "name":"testName010",
+    //     "age": 55
+    // }
     const { name, age } = ctx.request.body;
     let leaderModel = {
       name,
@@ -110,6 +114,11 @@ export default class UserController {
   // 给具体某个 leader 添加关联任务表
   @post('/leaderAddTask')
   async leaderAddTask(ctx: any) {
+    //   {
+    //     "leaderId": "9bf0e276-9cf8-466a-8c70-c621dc836e5d",
+    //     "taskName": "测试任务062",
+    //     "level": "3"
+    // }
     const { leaderId, taskName, level } = ctx.request.body;
     if (!leaderId) {
       throw new Error("leaderId is not null");
@@ -131,7 +140,7 @@ export default class UserController {
     await taskModelInstance.create(tempTask);
     // let addRes = await leaderItem.addTask(taskItem);
     // console.log('addRes ------------- ', addRes.toJSON());
-    
+
     // todo important: 一对多的时候注意配置方法后面加上 s ，如果设置了别名，此处方法名称也要换成别名的形式
     return leaderItem.getTasks()
   }
@@ -146,6 +155,7 @@ export default class UserController {
   /** 延迟加载示例 */
   @post('/loadSyncData')
   async loadSyncData(ctx: any) {
+    // http://localhost:3300/AssociateController/loadSyncData?id=1b6fddad-f262-4219-8820-2f67ab25543d
     const { id } = ctx.request.query;
     if (!id) {
       logUtils.error("/AssociateController/loadSyncData---- id 值不能为空");
@@ -180,6 +190,7 @@ export default class UserController {
   /** 预先加载 */
   @post('/loadPreData')
   async loadPreData(ctx: any) {
+    // http://localhost:3300/AssociateController/loadSyncData?id=1b6fddad-f262-4219-8820-2f67ab25543d
     const { id } = ctx.request.query;
     if (!id) {
       logUtils.error("/AssociateController/loadSyncData---- id 值不能为空");

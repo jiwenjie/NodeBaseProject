@@ -313,3 +313,384 @@ taskInstance.getAuthor()
 taskInstance.setAuthor()
 taskInstance.createAuthor()
 ```
+
+**验证器**
+> 使用模型验证器,可以为模型的每个属性指定 格式/内容/继承 验证. 验证会自动在 create, update 和 save 时运行. 你还可以调用 validate() 来手动验证实例.
+```
+sequelize.define('foo', {
+  bar: {
+    type: DataTypes.STRING,
+    validate: {
+      is: /^[a-z]+$/i,          // 匹配这个 RegExp
+      is: ["^[a-z]+$",'i'],     // 与上面相同,但是以字符串构造 RegExp
+      not: /^[a-z]+$/i,         // 不匹配 RegExp
+      not: ["^[a-z]+$",'i'],    // 与上面相同,但是以字符串构造 RegExp
+      isEmail: true,            // 检查 email 格式 (foo@bar.com)
+      isUrl: true,              // 检查 url 格式 (http://foo.com)
+      isIP: true,               // 检查 IPv4 (129.89.23.1) 或 IPv6 格式
+      isIPv4: true,             // 检查 IPv4 格式 (129.89.23.1)
+      isIPv6: true,             // 检查 IPv6 格式
+      isAlpha: true,            // 只允许字母
+      isAlphanumeric: true,     // 将仅允许使用字母数字,因此 '_abc' 将失败
+      isNumeric: true,          // 只允许数字
+      isInt: true,              // 检查有效的整数
+      isFloat: true,            // 检查有效的浮点数
+      isDecimal: true,          // 检查任何数字
+      isLowercase: true,        // 检查小写
+      isUppercase: true,        // 检查大写
+      notNull: true,            // 不允许为空
+      isNull: true,             // 只允许为空
+      notEmpty: true,           // 不允许空字符串
+      equals: 'specific value', // 仅允许 'specific value'
+      contains: 'foo',          // 强制特定子字符串
+      notIn: [['foo', 'bar']],  // 检查值不是这些之一
+      isIn: [['foo', 'bar']],   // 检查值是其中之一
+      notContains: 'bar',       // 不允许特定的子字符串
+      len: [2,10],              // 仅允许长度在2到10之间的值
+      isUUID: 4,                // 只允许 uuid
+      isDate: true,             // 只允许日期字符串
+      isAfter: "2011-11-05",    // 仅允许特定日期之后的日期字符串
+      isBefore: "2011-11-05",   // 仅允许特定日期之前的日期字符串
+      max: 23,                  // 仅允许值 <= 23
+      min: 23,                  // 仅允许值 >= 23
+      isCreditCard: true,       // 检查有效的信用卡号
+
+      // 自定义验证器的示例:
+      isEven(value) {
+        if (parseInt(value) % 2 !== 0) {
+          throw new Error('Only even values are allowed!');
+        }
+      }
+      
+      isGreaterThanOtherField(value) {
+        if (parseInt(value) <= parseInt(this.otherField)) {
+          throw new Error('Bar must be greater than otherField.');
+        }
+      }
+    }
+  }
+});
+```
+
+*allowNull 与其他验证器的交互*
+如果将模型的特定字段设置为不允许为 null(使用 allowNull: false),并且该值已设置为 null,则将跳过所有验证器,并抛出 ValidationError.
+
+另一方面,如果将其设置为允许 null(使用 allowNull: true),并且该值已设置为 null,则仅会跳过内置验证器,而自定义验证器仍将运行.
+
+举例来说,这意味着你可以拥有一个字符串字段,该字段用于验证其长度在5到10个字符之间,但也允许使用 null (因为当该值为 null 时,长度验证器将被自动跳过)：
+```
+class User extends Model {}
+User.init({
+  username: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    validate: {
+      len: [5, 10]
+    }
+  }
+}, { sequelize });
+你也可以使用自定义验证器有条件地允许 null 值,因为不会跳过它：
+
+class User extends Model {}
+User.init({
+  age: Sequelize.INTEGER,
+  name: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    validate: {
+      customValidator(value) {
+        if (value === null && this.age !== 10) {
+          throw new Error("除非年龄为10,否则名称不能为 null");
+        }
+      })
+    }
+  }
+}, { sequelize });
+你可以通过设置 notNull 验证器来自定义 allowNull 错误消息：
+
+class User extends Model {}
+User.init({
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      notNull: {
+        msg: '请输入你的名字'
+      }
+    }
+  }
+}, { sequelize });
+```
+*模型范围内的验证*
+还可以定义验证,来在特定于字段的验证器之后检查模型. 例如,使用此方法,可以确保既未设置 latitude 和 longitude,又未同时设置两者. 如果设置了一个但未设置另一个,则失败.
+
+使用模型对象的上下文调用模型验证器方法,如果它们抛出错误,则认为失败,否则将通过. 这与自定义字段特定的验证器相同.
+
+所收集的任何错误消息都将与字段验证错误一起放入验证结果对象中,其关键字以 validate 选项对象中验证方法失败的键命名. 即便在任何时候每种模型验证方法都只有一个错误消息,但它会在数组中显示为单个字符串错误,以最大程度地提高与字段错误的一致性.
+```
+一个例子:
+
+class Place extends Model {}
+Place.init({
+  name: Sequelize.STRING,
+  address: Sequelize.STRING,
+  latitude: {
+    type: DataTypes.INTEGER,
+    validate: {
+      min: -90,
+      max: 90
+    }
+  },
+  longitude: {
+    type: DataTypes.INTEGER,
+    validate: {
+      min: -180,
+      max: 180
+    }
+  },
+}, {
+  sequelize,
+  validate: {
+    bothCoordsOrNone() {
+      if ((this.latitude === null) !== (this.longitude === null)) {
+        throw new Error('Either both latitude and longitude, or neither!');
+      }
+    }
+  }
+})
+在这种简单的情况下,如果只给定了纬度或经度,而不是同时给出两者, 则不能验证对象. 如果我们尝试构建一个超出范围的纬度且没有经度的对象,则somePlace.validate() 可能会返回：
+
+{
+  'latitude': ['Invalid number: latitude'],
+  'bothCoordsOrNone': ['Either both latitude and longitude, or neither!']
+}
+也可以使用在单个属性上定义的自定义验证程序(例如 latitude 属性,通过检查 (value === null) !== (this.longitude === null) )来完成此类验证, 但模型范围内的验证方法更为简洁.
+```
+
+**多对多关系的优化使用**
+让我们从 User 和 Profile 之间的多对多关系示例开始.
+```
+const User = sequelize.define('user', {
+  username: DataTypes.STRING,
+  points: DataTypes.INTEGER
+}, { timestamps: false });
+const Profile = sequelize.define('profile', {
+  name: DataTypes.STRING
+}, { timestamps: false });
+```
+
+定义多对多关系的最简单方法是 (此种方法测试没有自动生成中间表，不清楚是不是版本和配置的原因)
+```
+User.belongsToMany(Profile, { through: 'User_Profiles' });
+Profile.belongsToMany(User, { through: 'User_Profiles' });
+```
+
+*我们还可以为自己定义一个模型,以用作联结表. 重点部分*
+
+>tips: 注意此处只是官网示例文档，实际使用需要把外键字段等内容定义完全，可以惨开 AssociaMNController.ts 文件 
+```
+const User_Profile = sequelize.define('User_Profile', {}, { timestamps: false });
+User.belongsToMany(Profile, { through: User_Profile });
+Profile.belongsToMany(User, { through: User_Profile });
+```
+
+使用示例
+```
+const amidala = await User.create({ username: 'p4dm3', points: 1000 });
+const queen = await Profile.create({ name: 'Queen' });
+await amidala.addProfile(queen, { through: { selfGranted: false } });
+const result = await User.findOne({
+  where: { username: 'p4dm3' },
+  include: Profile
+});
+console.log(result);
+```
+输出示例：
+```
+{
+  "id": 4,
+  "username": "p4dm3",
+  "points": 1000,
+  "profiles": [
+    {
+      "id": 6,
+      "name": "queen",
+      "User_Profile": {
+        "userId": 4,
+        "profileId": 6,
+        "selfGranted": false
+      }
+    }
+  ]
+}
+```
+
+*你也可以在单个 create 调用中创建所有关系.*
+> 即批量插入数据内容，已完成示例，可以参考 AssociateMNCOntroller.ts 文件
+```
+const amidala = await User.create({
+  username: 'p4dm3',
+  points: 1000,
+  profiles: [{
+    name: 'Queen',
+    User_Profile: {
+      selfGranted: true
+    }
+  }]
+}, {
+  include: Profile
+});
+
+const result = await User.findOne({
+  where: { username: 'p4dm3' },
+  include: Profile
+});
+
+console.log(result);
+```
+
+输出示例
+```
+{
+  "id": 1,
+  "username": "p4dm3",
+  "points": 1000,
+  "profiles": [
+    {
+      "id": 1,
+      "name": "Queen",
+      "User_Profile": {
+        "selfGranted": true,
+        "userId": 1,
+        "profileId": 1
+      }
+    }
+  ]
+}
+```
+
+**联结表与普通表以及"超级多对多关联"**
+*模型回顾 (有少量重命名)*
+为了使事情更容易理解,让我们将 User_Profile 模型重命名为 grant. 请注意,所有操作均与以前相同. 我们的模型是：
+```
+const User = sequelize.define('user', {
+  username: DataTypes.STRING,
+  points: DataTypes.INTEGER
+}, { timestamps: false });
+
+const Profile = sequelize.define('profile', {
+  name: DataTypes.STRING
+}, { timestamps: false });
+
+const Grant = sequelize.define('grant', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+    allowNull: false
+  },
+  selfGranted: DataTypes.BOOLEAN
+}, { timestamps: false });
+```
+
+我们使用 Grant 模型作为联结表在 User 和 Profile 之间建立了多对多关系：
+```
+User.belongsToMany(Profile, { through: Grant });
+Profile.belongsToMany(User, { through: Grant });
+```
+这会自动将 userId 和 profileId 列添加到 Grant 模型中.
+
+注意: 如上所示,我们选择强制 grant 模型具有单个主键(通常称为 id). 对于 超级多对多关系(即将定义),这是必需的.
+
+**改用一对多关系**
+除了建立上面定义的多对多关系之外,如果我们执行以下操作怎么办？
+```
+// 在 User 和 Grant 之间设置一对多关系
+User.hasMany(Grant);
+Grant.belongsTo(User);
+
+// 在Profile 和 Grant 之间也设置一对多关系
+Profile.hasMany(Grant);
+Grant.belongsTo(Profile);
+```
+
+结果基本相同！ 这是因为 User.hasMany(Grant) 和 Profile.hasMany(Grant) 会分别自动将 userId 和 profileId 列添加到 Grant 中.
+
+这表明一个多对多关系与两个一对多关系没有太大区别. 数据库中的表看起来相同.
+
+唯一的区别是你尝试使用 Sequelize 执行预先加载时.
+
+```
+// 使用多对多方法,你可以:
+User.findAll({ include: Profile });
+Profile.findAll({ include: User });
+// However, you can't do:
+User.findAll({ include: Grant });
+Profile.findAll({ include: Grant });
+Grant.findAll({ include: User });
+Grant.findAll({ include: Profile });
+
+// 另一方面,通过双重一对多方法,你可以:
+User.findAll({ include: Grant });
+Profile.findAll({ include: Grant });
+Grant.findAll({ include: User });
+Grant.findAll({ include: Profile });
+// However, you can't do:
+User.findAll({ include: Profile });
+Profile.findAll({ include: User });
+// 尽管你可以使用嵌套 include 来模拟那些,如下所示:
+User.findAll({
+  include: {
+    model: Grant,
+    include: Profile
+  }
+}); // 这模拟了 `User.findAll({ include: Profile })`,
+    // 但是生成的对象结构有些不同.
+    // 原始结构的格式为 `user.profiles[].grant`,
+    // 而模拟结构的格式为 `user.grants[].profiles[]`
+```
+
+**两全其美：超级多对多关系**
+我们可以简单地组合上面显示的两种方法！
+```
+// 超级多对多关系
+User.belongsToMany(Profile, { through: Grant });
+Profile.belongsToMany(User, { through: Grant });
+User.hasMany(Grant);
+Grant.belongsTo(User);
+Profile.hasMany(Grant);
+Grant.belongsTo(Profile);
+```
+
+这样,我们可以进行各种预先加载：
+```
+// 全部可以使用:
+User.findAll({ include: Profile });
+Profile.findAll({ include: User });
+User.findAll({ include: Grant });
+Profile.findAll({ include: Grant });
+Grant.findAll({ include: User });
+Grant.findAll({ include: Profile });
+```
+
+我们甚至可以执行各种深层嵌套的 include：
+```
+User.findAll({
+  include: [
+    {
+      model: Grant,
+      include: [User, Profile]
+    },
+    {
+      model: Profile,
+      include: {
+        model: User,
+        include: {
+          model: Grant,
+          include: [User, Profile]
+        }
+      }
+    }
+  ]
+});
+```
