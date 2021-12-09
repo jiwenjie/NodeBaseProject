@@ -8,6 +8,7 @@
     "build": "tsc"
   },
   "dependencies": {
+    "@types/koa-session": "^5.10.4",
     "chalk": "^4.1.2",
     "clipboard": "^2.0.6",
     "core-js": "^3.6.5",
@@ -18,7 +19,9 @@
     "koa": "^2.13.4",
     "koa-body": "^4.2.0",
     "koa-logger": "^3.2.1",
+    "koa-redis": "^4.0.1",
     "koa-router": "^10.1.1",
+    "koa-session": "^6.2.0",
     "koa2-cors": "^2.0.6",
     "lodash": "^4.17.21",
     "log4js": "^6.3.0",
