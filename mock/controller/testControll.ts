@@ -9,13 +9,12 @@
 import { post, prefix, get } from "../requestDecorator";
 import faker from 'faker'
 
-
 @prefix('/syncCaseItems')
 export default class syncCaseItems {
 
   @post('/num')
-  async num(ctx: any) {
-    console.log('ctx------------------', ctx.request.header)
+  async num() {
+    // console.log('ctx------------------', ctx)
     return {
         data: '啊是擦上擦擦是VS的'
     }

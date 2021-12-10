@@ -56,6 +56,7 @@ export interface UserModel {
 @prefix('/userController')
 export default class UserController {
 
+  // 创建用户
   @post('/createUser')
   async createUser(ctx: any) {
     const { username, pwd, nickname } = ctx.request.body;
@@ -68,6 +69,18 @@ export default class UserController {
     // Sequelize提供了 create 方法,该方法将上述的 build 方法和 save 方法合并为一个方法：
     let user = await usersModel.create(userNodel);
     return user;
+  }
+
+  // 注册用户
+  @post('/registerUser') 
+  async registerUser(ctx: any) {
+    console.log('/registerUser', ctx)
+  }
+
+  // 登录用户
+  @post('/loginUser') 
+  async loginUser(ctx: any) {
+    console.log('/loginUser', ctx)
   }
 
   @post('/deleteUser')

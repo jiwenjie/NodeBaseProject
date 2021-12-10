@@ -67,8 +67,6 @@ const addRouter = (router: Router) => {
 
   // 结合meta数据添加路由 和 验证
   modules.forEach(mItem => {
-    // console.log('modules item', mItem);
-
     const routerMap: RouteMeta[] = Reflect.getMetadata(ROUTER_MAP, mItem, 'method') || [];
     // console.log('routerMap--', routerMap);
 
