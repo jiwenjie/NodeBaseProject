@@ -22,7 +22,7 @@ function createMethodDecorator(method: string) {
      * @Params 装饰器第一个参数是 类的原型对象 、
      * @todo tips：装饰器的本意是要“装饰”类的实例，但是这个时候实例还没生成，
      *        所以只能去装饰原型（这不同于类的装饰，那种情况时target参数指的是类本身）；
-     * @Params 第二个参数是 所要装饰的属性名
+     * @Params 第二个参数是 所要装饰的属性名 (即定义的方法名称)
      * @Params 第三个参数是 该属性的描述对象(此处省略该参数)
      */
     return (proto: any, name: string) => {
