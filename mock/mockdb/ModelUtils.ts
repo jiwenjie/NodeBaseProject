@@ -1,5 +1,13 @@
+/*
+ * @Author: your name
+ * @Date: 2021-12-11 13:18:45
+ * @LastEditTime: 2021-12-11 13:24:26
+ * @LastEditors: your name
+ * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ * @FilePath: /htmlTemplete/Users/jiwenjie/Desktop/codeWorkSpace/VsCodeSpace/do-it-myself/NodeBaseProject/mock/mockdb/ModelUtils.ts
+ */
 import SequelizeInstance from "../mockdb/db";   // 导入数据库实例信息
-let { Sequelize, Model, DataTypes } = require('sequelize');
+// let { Sequelize, Model, DataTypes } = require('sequelize');
 
 // modelOption 配置部分
 // id: {
@@ -28,7 +36,7 @@ let { Sequelize, Model, DataTypes } = require('sequelize');
 //     type: DataTypes.STRING
 // },
 // }
-/** 
+/**
  * @param modelName 用来配置 model 的名称，映射表名称
  * @param modelOption 用来配置 model 的字段属性，映射表里的字段
  * @param tableOption Model 创建表的属性，用来配置表中的其他属性
