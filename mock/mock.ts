@@ -3,7 +3,7 @@
  * @Author: 吉文杰
  * @Date: 2021-11-20 09:46:46
  * @LastEditors: jiwenjie5
- * @LastEditTime: 2021-12-27 20:11:04
+ * @LastEditTime: 2022-03-16 16:45:36
  */
 import Koa, { Context } from "koa";
 import koaBody from "koa-body";
@@ -38,7 +38,6 @@ const app = new Koa();
 //     allowHeaders: ['Content-Type', 'Authorization', 'Accept'],
 // }))
 app.use(cors());
-
 // 实例化路由对象
 const router = new koaRouter();
 
@@ -69,32 +68,36 @@ app.use(koaBody());
 // koa 中中间件传参把参数挂在 ctx.state.xxxxxxx 上 即可，无法直接通过 next 对象传参
 app.use(async (ctx, next) => {
   log4.debug(path.dirname, chalk.green('请求body:  ') + JSON.stringify(ctx.request.body));
+  // http://localhost:3300/syncCaseItems/num 实际浏览器请求完全路径，
+  // 请求 request url:  /syncCaseItems/num，打印结果示例展示
   let interfaceUrl = ctx.request.url;
-  // 如果判断是白名单中的内容
-  if (whiteList.includes(interfaceUrl)) {
-    // 在白名单中，直接放行
-    await next();
-  } else {
-    // 校验请求 cookie 是否存在
-    let sessionId = ctx.cookies.get('sessionId');
-    if (!sessionId) {
-      log4.debug(path.dirname, chalk.green('请求中 sessionId 不存在: 返回错误信息'));
+  console.log("请求 request url: ", interfaceUrl);
+  
+  // // 如果判断是白名单中的内容
+  // if (whiteList.includes(interfaceUrl)) {
+  //   // 在白名单中，直接放行
+  //   await next();
+  // } else {
+  //   // 校验请求 cookie 是否存在
+  //   let sessionId = ctx.cookies.get('sessionId');
+  //   if (!sessionId) {
+  //     log4.debug(path.dirname, chalk.green('请求中 sessionId 不存在: 返回错误信息'));
 
-      let res: ResultInfo = {
-        code: 401,
-        msg: "Authortiod, please login",
-        data: "plaseLogin"
-      }
-      ctx.body = res;
-      return;
-    } else {
-      // 如果有 sessionId 值则去 redis 缓存中查询是否存在，存在即未过期，不存在则表示过期
-      // 如果查到则直接下一步
-      // 取出对象
-      await next();
-    }
-  }
-  // await next()
+  //     let res: ResultInfo = {
+  //       code: 401,
+  //       msg: "Authortiod, please login",
+  //       data: "plaseLogin"
+  //     }
+  //     ctx.body = res;
+  //     return;
+  //   } else {
+  //     // 如果有 sessionId 值则去 redis 缓存中查询是否存在，存在即未过期，不存在则表示过期
+  //     // 如果查到则直接下一步
+  //     // 取出对象
+  //     await next();
+  //   }
+  // }
+  await next()
   // chalk todo 控制台打印内容样式改变框架（用来设置控制台输出内容的颜色）
   // log4.debug(chalk.green('请求路径:  ') + ctx.request.url);
   log4.debug(path.dirname, chalk.green('返回数据:  ') + JSON.stringify(ctx.body));

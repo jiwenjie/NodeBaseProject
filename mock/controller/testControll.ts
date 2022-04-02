@@ -12,7 +12,7 @@ import faker from 'faker'
 @prefix('/syncCaseItems')
 export default class syncCaseItems {
 
-  @post('/num')
+  @get('/num')
   async num() {
     // console.log('ctx------------------', ctx)
     return {
