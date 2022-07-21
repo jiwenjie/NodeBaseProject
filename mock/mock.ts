@@ -3,7 +3,7 @@
  * @Author: 吉文杰
  * @Date: 2021-11-20 09:46:46
  * @LastEditors: jiwenjie5
- * @LastEditTime: 2022-03-16 16:45:36
+ * @LastEditTime: 2022-07-21 10:40:03
  */
 import Koa, { Context } from "koa";
 import koaBody from "koa-body";
@@ -11,12 +11,12 @@ import koaRouter from "koa-router";
 import addRouter from "./router";
 import logger from "koa-logger";
 import log4js from "log4js";
-import { ResultInfo, ResultHandler } from './middleware/resultHandler'
+import { ResultHandler } from './middleware/resultHandler'
 import chalk from "chalk";    // 控制日志输出颜色的库内容
 import cors from "koa2-cors";
 import path from 'path';
-import { whiteList } from './config/whiteListConfig';
-import { initWebSocket } from "./utils/Socket";
+// import { whiteList } from './config/whiteListConfig';
+// import { initWebSocket } from "./utils/Socket";
 
 // 准备添加 redis 使用，用户登录验证，cookie 和 session 部分内容
 // koa 设置 cookie 之后会自动加上 HttpOnly 属性，直接把用户信息存放在 Cookie 中不够安全，此时可以考虑使用 session 存放
@@ -67,12 +67,17 @@ app.use(koaBody());
 // 对所有请求进行拦截，打印出所有的请求和响应日志数据
 // koa 中中间件传参把参数挂在 ctx.state.xxxxxxx 上 即可，无法直接通过 next 对象传参
 app.use(async (ctx, next) => {
-  log4.debug(path.dirname, chalk.green('请求body:  ') + JSON.stringify(ctx.request.body));
+  // log4.debug('ctx.request', ctx.request)
+  // log4.debug(path.dirname, chalk.green('请求body:  ') + JSON.stringify(ctx.request.body));
   // http://localhost:3300/syncCaseItems/num 实际浏览器请求完全路径，
   // 请求 request url:  /syncCaseItems/num，打印结果示例展示
   let interfaceUrl = ctx.request.url;
   console.log("请求 request url: ", interfaceUrl);
-  
+
+  // 设置跨域安全共享字段（响应头信息内容值）
+  ctx.set('Cross-Origin-Opener-Policy', 'same-origin')
+  ctx.set('Cross-Origin-Embedder-Policy', 'require-corp')
+
   // // 如果判断是白名单中的内容
   // if (whiteList.includes(interfaceUrl)) {
   //   // 在白名单中，直接放行
@@ -82,7 +87,6 @@ app.use(async (ctx, next) => {
   //   let sessionId = ctx.cookies.get('sessionId');
   //   if (!sessionId) {
   //     log4.debug(path.dirname, chalk.green('请求中 sessionId 不存在: 返回错误信息'));
-
   //     let res: ResultInfo = {
   //       code: 401,
   //       msg: "Authortiod, please login",
@@ -112,7 +116,7 @@ addRouter(router);
 
 // 启动路由
 app.use(router.routes())
-   .use(router.allowedMethods());
+  .use(router.allowedMethods());
 
 app.use(async (ctx: Context) => {
   log4.error(`404 ${ctx.message} : ${ctx.href}`);
@@ -131,11 +135,11 @@ app.on("error", (err, ctx: Context) => {
 });
 
 // 初始化 socket 连接
-let serverInstance = initWebSocket(true);
+// let serverInstance = initWebSocket(true);
 // close 方法关闭 socket 连接
 // serverInstance.close();
 
 // 开启端口监听
 app.listen(port, () => {
-  log4.debug("mock server running at: http://localhost:%d", port);
+  log4.debug(chalk.red("mock server running at: http://localhost:%d"), port);
 });
